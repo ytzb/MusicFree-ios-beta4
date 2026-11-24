@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MusicFree iOS 榜单页设计稿</title>
+<style>
+  :root {
+    --bg: #07111f;
+    --bg-elevated: #0d1b2d;
+    --bg-card: rgba(15, 29, 48, 0.92);
+    --bg-soft: rgba(255, 255, 255, 0.05);
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.16);
+    --text: #f6f8fb;
+    --text-secondary: #91a1b7;
+    --text-faint: #64748b;
+    --brand: #ff7a45;
+    --brand-soft: rgba(255, 122, 69, 0.14);
+    --accent: #ffd166;
+    --green: #3dd598;
+    --danger: #ff6b6b;
+    --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    --radius-xl: 28px;
+    --radius-lg: 22px;
+    --radius-md: 18px;
+    --radius-sm: 14px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    font-family: "Avenir Next", "SF Pro Display", "PingFang SC", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(255, 122, 69, 0.22), transparent 28%),
+      radial-gradient(circle at top right, rgba(255, 209, 102, 0.18), transparent 22%),
+      linear-gradient(180deg, #04101d 0%, #07111f 42%, #030913 100%);
+    color: var(--text);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 220px minmax(420px, 1fr) 320px;
+    min-height: 100vh;
+  }
+
+  .left-panel,
+  .right-panel {
+    padding: 28px 22px;
+    backdrop-filter: blur(18px);
+    background: rgba(4, 10, 19, 0.72);
+  }
+
+  .left-panel {
+    border-right: 1px solid var(--line);
+  }
+
+  .right-panel {
+    border-left: 1px solid var(--line);
+  }
+
+  .left-title,
+  .panel-title {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+  }
+
+  .project-title {
+    font-size: 26px;
+    line-height: 1.15;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .project-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 26px;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-btn {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 12px 14px;
+    border-radius: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.22s ease;
+  }
+
+  .nav-btn:hover,
+  .nav-btn.active {
+    background: var(--bg-soft);
+    border-color: var(--line-strong);
+    color: var(--text);
+    transform: translateX(2px);
+  }
+
+  .nav-btn strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .nav-btn span {
+    display: block;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .main-panel {
+    padding: 28px 18px 36px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .panel-caption {
+    width: min(100%, 430px);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .phone {
+    width: 390px;
+    min-height: 844px;
+    border-radius: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background:
+      linear-gradient(180deg, rgba(18, 27, 42, 0.96) 0%, rgba(6, 13, 24, 0.98) 100%);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .status-bar {
+    padding: 14px 22px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .status-icons {
+    display: flex;
+    gap: 8px;
+    color: var(--text-secondary);
+  }
+
+  .screen {
+    display: none;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  .scroll {
+    height: 792px;
+    overflow: auto;
+    scrollbar-width: none;
+    padding-bottom: 24px;
+  }
+
+  .scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 18px 8px;
+  }
+
+  .app-title {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .app-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.04);
+    display: grid;
+    place-items: center;
+    color: var(--text-secondary);
+  }
+
+  .plugin-tabs {
+    display: flex;
+    gap: 10px;
+    overflow: auto;
+    padding: 10px 18px 4px;
+    scrollbar-width: none;
+  }
+
+  .plugin-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .plugin-tab {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 10px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s ease;
+  }
+
+  .plugin-tab.active {
+    background: linear-gradient(135deg, rgba(255, 122, 69, 0.22), rgba(255, 209, 102, 0.18));
+    border-color: rgba(255, 122, 69, 0.35);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+
+  .section {
+    padding: 16px 18px 0;
+  }
+
+  .hero-card {
+    position: relative;
+    overflow: hidden;
+    padding: 18px;
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at right top, rgba(255, 209, 102, 0.28), transparent 30%),
+      linear-gradient(135deg, rgba(255, 122, 69, 0.22), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-card::after {
+    content: "";
+    position: absolute;
+    inset: auto -36px -42px auto;
+    width: 130px;
+    height: 130px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 68%);
+  }
+
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .hero-copy small,
+  .card-meta small,
+  .muted-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .hero-copy h2 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.08;
+  }
+
+  .hero-copy p {
+    margin: 10px 0 0;
+    color: rgba(246, 248, 251, 0.82);
+    font-size: 13px;
+    line-height: 1.65;
+    max-width: 210px;
+  }
+
+  .hero-cover {
+    width: 108px;
+    height: 108px;
+    border-radius: 26px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 122, 69, 0.14)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='28' fill='%23152235'/%3E%3Ccircle cx='60' cy='60' r='34' fill='%23ff7a45' fill-opacity='.2'/%3E%3Cpath d='M74 36v34.5a13 13 0 1 1-8-12V46l-20 4v27.5a13 13 0 1 1-8-12V41.5L74 36Z' fill='%23fff' fill-opacity='.92'/%3E%3C/svg%3E") center/cover no-repeat;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    flex-shrink: 0;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .hero-stat {
+    flex: 1;
+    border-radius: 18px;
+    padding: 10px 12px;
+    background: rgba(3, 9, 19, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-stat strong {
+    display: block;
+    font-size: 17px;
+    margin-bottom: 3px;
+  }
+
+  .hero-stat span {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .section-subtitle {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .ghost-link {
+    color: var(--accent);
+    font-size: 12px;
+  }
+
+  .featured-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .board-card {
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    border-radius: 22px;
+    padding: 12px;
+    min-height: 196px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .board-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 209, 102, 0.32);
+    box-shadow: 0 20px 32px rgba(0, 0, 0, 0.22);
+  }
+
+  .board-cover {
+    position: relative;
+    height: 118px;
+    border-radius: 18px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .board-cover::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 42px;
+    background: linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.48));
+  }
+
+  .board-cover.hot {
+    background:
+      linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.55)),
+      linear-gradient(135deg, #fd7c4a, #fb475e 55%, #18253a);
+  }
+
+  .board-cover.rise {
+    background:
+      linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.55)),
+      linear-gradient(135deg, #4ea9ff, #52d6a4 58%, #152235);
+  }
+
+  .board-cover.peak {
+    background:
+      linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.55)),
+      linear-gradient(135deg, #ffd166, #ff9f43 52%, #152235);
+  }
+
+  .board-cover.indie {
+    background:
+      linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.55)),
+      linear-gradient(135deg, #c77dff, #6c63ff 52%, #18253a);
+  }
+
+  .board-cover.global {
+    background:
+      linear-gradient(180deg, transparent, rgba(3, 9, 19, 0.55)),
+      linear-gradient(135deg, #7bdff2, #94f7a1 55%, #162638);
+  }
+
+  .cover-tag {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(3, 9, 19, 0.46);
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+  }
+
+  .board-rank {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .board-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .board-desc {
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    min-height: 38px;
+  }
+
+  .board-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-top: auto;
+    gap: 10px;
+  }
+
+  .board-footnote {
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--brand);
+    background: var(--brand-soft);
+    border: 1px solid rgba(255, 122, 69, 0.22);
+  }
+
+  .group-block {
+    margin-top: 18px;
+  }
+
+  .group-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .chip {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--line);
+  }
+
+  .bottom-tip {
+    margin: 18px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .skeleton-block,
+  .skeleton-line {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.1), rgba(255,255,255,0.04));
+    background-size: 200% 100%;
+    animation: shimmer 1.35s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .skeleton-card {
+    border-radius: 24px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    background: var(--bg-card);
+    margin-bottom: 12px;
+  }
+
+  .skeleton-block {
+    border-radius: 20px;
+    height: 118px;
+    margin-bottom: 12px;
+  }
+
+  .skeleton-line {
+    height: 12px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-line.wide { width: 78%; }
+  .skeleton-line.mid { width: 56%; }
+  .skeleton-line.short { width: 34%; }
+
+  .empty-state {
+    min-height: 710px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0 34px;
+  }
+
+  .empty-visual {
+    width: 128px;
+    height: 128px;
+    border-radius: 36px;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255, 209, 102, 0.52), transparent 40%),
+      linear-gradient(135deg, rgba(255, 122, 69, 0.22), rgba(255, 255, 255, 0.03));
+    display: grid;
+    place-items: center;
+    font-size: 44px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .empty-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .empty-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+
+  .primary-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 12px 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #ff7a45, #ff9f43);
+    box-shadow: 0 14px 28px rgba(255, 122, 69, 0.24);
+  }
+
+  .sheet-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 5, 11, 0.66);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: end;
+    z-index: 10;
+  }
+
+  .sheet-mask.open {
+    display: flex;
+  }
+
+  .bottom-sheet {
+    width: 100%;
+    border-radius: 28px 28px 0 0;
+    background: linear-gradient(180deg, #101c2d 0%, #091321 100%);
+    border-top: 1px solid var(--line-strong);
+    padding: 12px 18px 28px;
+    box-shadow: 0 -24px 48px rgba(0, 0, 0, 0.38);
+  }
+
+  .sheet-handle {
+    width: 42px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    margin: 4px auto 14px;
+  }
+
+  .sheet-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
+  .sheet-head h3 {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .sheet-head p {
+    margin: 6px 0 0;
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .close-sheet {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+  }
+
+  .mapping-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .mapping-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--line);
+    font-size: 12px;
+  }
+
+  .mapping-row strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .mapping-row span {
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .mapping-value {
+    color: var(--accent);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .info-block {
+    margin-bottom: 24px;
+  }
+
+  .info-text {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  .spec {
+    display: grid;
+    gap: 8px;
+  }
+
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .spec-row span:first-child {
+    color: var(--text-secondary);
+  }
+
+  .spec-row span:last-child {
+    max-width: 150px;
+    text-align: right;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chips .chip {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .note {
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 107, 107, 0.08);
+    border: 1px solid rgba(255, 107, 107, 0.18);
+    color: #ffb4b4;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1180px) {
+    .shell {
+      grid-template-columns: 220px 1fr;
+    }
+
+    .right-panel {
+      display: none;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .shell {
+      grid-template-columns: 1fr;
+    }
+
+    .left-panel {
+      display: none;
+    }
+
+    .main-panel {
+      padding: 18px 10px 26px;
+    }
+
+    .phone {
+      width: min(390px, calc(100vw - 20px));
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="left-panel">
+      <div class="left-title">Prototype</div>
+      <div class="project-title">榜单页<br>HTML 设计稿</div>
+      <div class="project-desc">
+        基于当前项目真实数据结构输出，只使用插件 Tab、榜单分组、榜单基础字段和详情页承接能力。
+      </div>
+
+      <div class="left-title">Screens</div>
+      <div class="nav-list">
+        <button class="nav-btn active" data-screen="overview">
+          <strong>主页面</strong>
+          <span>插件切换、精选区、分组卡片、详情预览</span>
+        </button>
+        <button class="nav-btn" data-screen="loading">
+          <strong>加载态</strong>
+          <span>替代整页转圈，展示骨架布局节奏</span>
+        </button>
+        <button class="nav-btn" data-screen="empty">
+          <strong>空状态</strong>
+          <span>当前插件暂无榜单时的页面占位</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <div class="panel-caption">
+        <span>MusicFree iOS</span>
+        <span>Top List Redesign</span>
+      </div>
+
+      <div class="phone">
+        <div class="status-bar">
+          <div>9:41</div>
+          <div class="status-icons">
+            <span>5G</span>
+            <span>◎◎◎</span>
+            <span>88%</span>
+          </div>
+        </div>
+
+        <section class="screen active" id="screen-overview">
+          <div class="scroll">
+            <div class="app-bar">
+              <div class="app-title">榜单</div>
+              <div class="app-actions">
+                <div class="icon-btn">⌕</div>
+                <div class="icon-btn">⋯</div>
+              </div>
+            </div>
+
+            <div class="plugin-tabs" id="plugin-tabs"></div>
+
+            <div class="section">
+              <div class="hero-card" id="hero-card"></div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">精选榜单</div>
+                  <div class="section-subtitle">从当前插件所有分组拍平后取前 3 个榜单</div>
+                </div>
+                <div class="ghost-link">无需新增接口</div>
+              </div>
+              <div class="featured-row" id="featured-row"></div>
+            </div>
+
+            <div id="groups-container"></div>
+
+            <div class="bottom-tip">
+              当前设计刻意不展示“榜内前三首歌曲预览”，因为列表页现有结构只有 `IMusicSheetGroupItem[] + IMusicSheetItemBase`，歌曲数据只会在详情页 `getTopListDetail` 返回。
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-loading">
+          <div class="scroll">
+            <div class="app-bar">
+              <div class="app-title">榜单</div>
+              <div class="app-actions">
+                <div class="icon-btn">⌕</div>
+                <div class="icon-btn">⋯</div>
+              </div>
+            </div>
+
+            <div class="plugin-tabs">
+              <div class="plugin-tab active">网易云</div>
+              <div class="plugin-tab">QQ音乐</div>
+              <div class="plugin-tab">咪咕</div>
+            </div>
+
+            <div class="section">
+              <div class="skeleton-card">
+                <div class="skeleton-block"></div>
+                <div class="skeleton-line wide"></div>
+                <div class="skeleton-line mid"></div>
+                <div class="skeleton-line short"></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">精选榜单</div>
+                  <div class="section-subtitle">加载中</div>
+                </div>
+              </div>
+              <div class="skeleton-card">
+                <div class="skeleton-block"></div>
+                <div class="skeleton-line wide"></div>
+                <div class="skeleton-line short"></div>
+              </div>
+              <div class="skeleton-card">
+                <div class="skeleton-line wide"></div>
+                <div class="skeleton-line mid"></div>
+                <div class="skeleton-line short"></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <div>
+                  <div class="section-title">官方榜</div>
+                  <div class="section-subtitle">正在加载榜单卡片</div>
+                </div>
+              </div>
+              <div class="group-grid">
+                <div class="skeleton-card">
+                  <div class="skeleton-block"></div>
+                  <div class="skeleton-line wide"></div>
+                  <div class="skeleton-line mid"></div>
+                </div>
+                <div class="skeleton-card">
+                  <div class="skeleton-block"></div>
+                  <div class="skeleton-line wide"></div>
+                  <div class="skeleton-line mid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-empty">
+          <div class="scroll">
+            <div class="app-bar">
+              <div class="app-title">榜单</div>
+              <div class="app-actions">
+                <div class="icon-btn">⌕</div>
+                <div class="icon-btn">⋯</div>
+              </div>
+            </div>
+
+            <div class="plugin-tabs">
+              <div class="plugin-tab">网易云</div>
+              <div class="plugin-tab active">自定义源</div>
+              <div class="plugin-tab">咪咕</div>
+            </div>
+
+            <div class="empty-state">
+              <div class="empty-visual">🏆</div>
+              <div class="empty-title">当前源暂无榜单</div>
+              <div class="empty-desc">
+                保留插件切换入口，不让页面塌成空白。这里可以继续切源，或者触发一次重试。
+              </div>
+              <button class="primary-btn">重新加载</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="sheet-mask" id="detail-sheet">
+          <div class="bottom-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-head">
+              <div>
+                <h3>榜单详情承接</h3>
+                <p>
+                  点击卡片仍然走现有 `TOP_LIST_DETAIL` 路由。这里展示的是设计层面的预览说明，不改现有导航与接口逻辑。
+                </p>
+              </div>
+              <button class="close-sheet" id="close-sheet">×</button>
+            </div>
+
+            <div class="mapping-list">
+              <div class="mapping-row">
+                <div>
+                  <strong>列表页卡片字段</strong>
+                  <span>封面、标题、描述、作品数、平台名，全部来自现有 `IMusicSheetItemBase`。</span>
+                </div>
+                <div class="mapping-value">无需新字段</div>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <strong>榜单歌曲列表</strong>
+                  <span>不在列表页预取，进入详情后再通过 `getTopListDetail(topListItem, page)` 获取。</span>
+                </div>
+                <div class="mapping-value">现状保持</div>
+              </div>
+              <div class="mapping-row">
+                <div>
+                  <strong>详情页头部信息</strong>
+                  <span>详情接口返回的 `topListItem` 可以覆盖列表页已有字段，继续沿用当前合并逻辑。</span>
+                </div>
+                <div class="mapping-value">可直接承接</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="info-block">
+        <div class="panel-title">设计方向</div>
+        <div class="info-text">
+          把当前“插件 Tab + SectionList + 单行列表项”改成更像内容页的浏览体验。重点不是加功能，而是重排层级：先看当前源最重要的榜，再看各分组。
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="panel-title">字段映射</div>
+        <div class="spec">
+          <div class="spec-row"><span>插件维度</span><span>`Plugin.name` -> Tab 标题</span></div>
+          <div class="spec-row"><span>分组标题</span><span>`IMusicSheetGroupItem.title`</span></div>
+          <div class="spec-row"><span>卡片标题</span><span>`topListItem.title`</span></div>
+          <div class="spec-row"><span>副文案</span><span>`description` 优先，没有则 `artist`</span></div>
+          <div class="spec-row"><span>封面</span><span>`artwork` / `coverImg`</span></div>
+          <div class="spec-row"><span>辅助信息</span><span>`worksNum`，没有则 `platform`</span></div>
+          <div class="spec-row"><span>歌曲列表</span><span>仅详情页 `musicList`</span></div>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="panel-title">交互原则</div>
+        <div class="chips">
+          <div class="chip">Tab 横滑</div>
+          <div class="chip">精选区吸引首屏注意力</div>
+          <div class="chip">分组保留</div>
+          <div class="chip">卡片双列</div>
+          <div class="chip">空态不塌陷</div>
+          <div class="chip">加载态骨架屏</div>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="panel-title">注意点</div>
+        <div class="note">
+          这个稿子故意没有做“榜内前 3 首歌”的列表摘要，因为当前 `getTopLists()` 返回值只到榜单级别。若后续一定要做，只能补接口或提前请求详情。
+        </div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+  const pluginData = {
+    netease: {
+      label: "网易云",
+      hero: {
+        title: "热榜总览",
+        desc: "把当前源最值得先看的榜单集中放在首屏，用户不需要先理解分组就能直接点进最热门内容。",
+        works: "28个榜",
+        source: "2个分组",
+        updated: "今日 09:00",
+      },
+      sections: [
+        {
+          title: "官方榜",
+          items: [
+            { title: "飙升榜", desc: "过去一周增长最快的热门歌曲，适合发现新爆点。", works: 100, platform: "网易云", skin: "hot" },
+            { title: "热歌榜", desc: "全站持续热播歌曲集合，适合作为默认入口。", works: 100, platform: "网易云", skin: "peak" },
+            { title: "新歌榜", desc: "最近发行和曝光度较高的新歌更新。", works: 100, platform: "网易云", skin: "rise" },
+            { title: "原创榜", desc: "独立创作者和原创作品的内容池。", works: 100, platform: "网易云", skin: "indie" }
+          ]
+        },
+        {
+          title: "特色榜",
+          items: [
+            { title: "说唱榜", desc: "更强调风格圈层，适合做二级兴趣入口。", works: 50, platform: "网易云", skin: "global" },
+            { title: "电音榜", desc: "适合夜间场景，视觉上可以更强烈。", works: 50, platform: "网易云", skin: "rise" },
+            { title: "ACG榜", desc: "二次元相关内容，可作为内容差异化补位。", works: 50, platform: "网易云", skin: "indie" }
+          ]
+        }
+      ]
+    },
+    qq: {
+      label: "QQ音乐",
+      hero: {
+        title: "全域热度",
+        desc: "QQ 音乐榜单更适合做成熟入口，首屏突出高认知榜单，降低用户选择成本。",
+        works: "18个榜",
+        source: "3个分组",
+        updated: "今日 08:40",
+      },
+      sections: [
+        {
+          title: "巅峰榜",
+          items: [
+            { title: "巅峰热歌榜", desc: "稳定流量入口，优先进入精选区。", works: 100, platform: "QQ音乐", skin: "peak" },
+            { title: "巅峰飙升榜", desc: "更强调趋势感，可用醒目的增量标签。", works: 100, platform: "QQ音乐", skin: "hot" },
+            { title: "巅峰新歌榜", desc: "新歌入口，适合强化更新感。", works: 100, platform: "QQ音乐", skin: "rise" }
+          ]
+        },
+        {
+          title: "地区榜",
+          items: [
+            { title: "欧美榜", desc: "可以放在较后位置，不抢首屏注意力。", works: 50, platform: "QQ音乐", skin: "global" },
+            { title: "日韩榜", desc: "兴趣向更明确，放双列卡片即可。", works: 50, platform: "QQ音乐", skin: "indie" }
+          ]
+        },
+        {
+          title: "风格榜",
+          items: [
+            { title: "K歌金曲榜", desc: "适合偏大众场景，描述文案可以更生活化。", works: 50, platform: "QQ音乐", skin: "peak" },
+            { title: "网络歌曲榜", desc: "可以放在较低层级，避免打散首屏焦点。", works: 50, platform: "QQ音乐", skin: "hot" }
+          ]
+        }
+      ]
+    },
+    migu: {
+      label: "咪咕",
+      hero: {
+        title: "轻量分发",
+        desc: "如果某个插件榜单量较少，也可以维持同一套结构，只是精选区和分组块数量更少。",
+        works: "9个榜",
+        source: "2个分组",
+        updated: "今日 07:55",
+      },
+      sections: [
+        {
+          title: "推荐榜",
+          items: [
+            { title: "咪咕热榜", desc: "少量榜单时也维持双列卡片，保证页面节奏一致。", works: 100, platform: "咪咕", skin: "hot" },
+            { title: "新歌推荐", desc: "用统一卡片结构补足更新感，不再混入特殊形态。", works: 100, platform: "咪咕", skin: "rise" }
+          ]
+        },
+        {
+          title: "分类榜",
+          items: [
+            { title: "影视金曲榜", desc: "当前结构仍然按分组承接，不做多级筛选。", works: 50, platform: "咪咕", skin: "global" },
+            { title: "国风榜", desc: "有风格辨识度，但信息层级不高于精选。", works: 50, platform: "咪咕", skin: "indie" },
+            { title: "旅行音乐榜", desc: "数量不大时双列卡片会比列表更饱满。", works: 30, platform: "咪咕", skin: "peak" }
+          ]
+        }
+      ]
+    }
+  };
+
+  const tabsEl = document.getElementById("plugin-tabs");
+  const heroEl = document.getElementById("hero-card");
+  const featuredEl = document.getElementById("featured-row");
+  const groupsEl = document.getElementById("groups-container");
+  const sheetEl = document.getElementById("detail-sheet");
+  const closeSheetEl = document.getElementById("close-sheet");
+
+  let currentPlugin = "netease";
+
+  function flattenSections(sections) {
+    return sections.reduce((acc, section) => acc.concat(section.items), []);
+  }
+
+  function tabTemplate(key, label) {
+    return `
+      <button class="plugin-tab ${currentPlugin === key ? "active" : ""}" data-plugin="${key}">
+        ${label}
+      </button>
+    `;
+  }
+
+  function heroTemplate(hero) {
+    return `
+      <div class="hero-top">
+        <div class="hero-copy">
+          <small>当前插件精选</small>
+          <h2>${hero.title}</h2>
+          <p>${hero.desc}</p>
+        </div>
+        <div class="hero-cover" aria-hidden="true"></div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <strong>${hero.works}</strong>
+          <span>榜单总量</span>
+        </div>
+        <div class="hero-stat">
+          <strong>${hero.source}</strong>
+          <span>当前分组</span>
+        </div>
+        <div class="hero-stat">
+          <strong>${hero.updated}</strong>
+          <span>更新时间</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function boardCardTemplate(item, options = {}) {
+    const {
+      tag = item.platform,
+      rank,
+      footnote = "description / worksNum"
+    } = options;
+
+    return `
+      <article class="board-card js-open-sheet">
+        <div class="board-cover ${item.skin}">
+          <div class="cover-tag">${tag}</div>
+          ${rank ? `<div class="board-rank">${rank}</div>` : ""}
+        </div>
+        <div class="board-title">${item.title}</div>
+        <div class="board-desc">${item.desc}</div>
+        <div class="board-meta">
+          <span>${item.works} 首</span>
+          <span class="board-footnote">${footnote}</span>
+        </div>
+      </article>
+    `;
+  }
+
+  function groupTemplate(section) {
+    const cards = section.items.map(item =>
+      boardCardTemplate(item, {
+        tag: item.platform,
+        footnote: "description / worksNum"
+      })
+    ).join("");
+
+    return `
+      <section class="section group-block">
+        <div class="section-head">
+          <div>
+            <div class="section-title">${section.title || "未命名分组"}</div>
+            <div class="section-subtitle">${section.items.length} 个榜单，保留现有 Section 结构</div>
+          </div>
+          <div class="ghost-link">双列卡片</div>
+        </div>
+        <div class="group-grid">${cards}</div>
+      </section>
+    `;
+  }
+
+  function render() {
+    const data = pluginData[currentPlugin];
+    const featured = flattenSections(data.sections).slice(0, 3);
+
+    tabsEl.innerHTML = Object.entries(pluginData)
+      .map(([key, value]) => tabTemplate(key, value.label))
+      .join("");
+
+    heroEl.innerHTML = heroTemplate(data.hero);
+    featuredEl.innerHTML = featured.map((item, index) =>
+      boardCardTemplate(item, {
+        tag: `Top ${index + 1}`,
+        rank: String(index + 1).padStart(2, "0"),
+        footnote: "详情页承接"
+      })
+    ).join("");
+
+    groupsEl.innerHTML = data.sections.map(groupTemplate).join("");
+
+    tabsEl.querySelectorAll(".plugin-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentPlugin = btn.dataset.plugin;
+        render();
+      });
+    });
+
+    document.querySelectorAll(".js-open-sheet").forEach(card => {
+      card.addEventListener("click", () => {
+        sheetEl.classList.add("open");
+      });
+    });
+  }
+
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const screen = btn.dataset.screen;
+      document.querySelectorAll(".nav-btn").forEach(item => item.classList.remove("active"));
+      document.querySelectorAll(".screen").forEach(item => item.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("screen-" + screen).classList.add("active");
+    });
+  });
+
+  closeSheetEl.addEventListener("click", () => {
+    sheetEl.classList.remove("open");
+  });
+
+  sheetEl.addEventListener("click", event => {
+    if (event.target === sheetEl) {
+      sheetEl.classList.remove("open");
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
